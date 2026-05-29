@@ -5,19 +5,25 @@ from flask_cors import CORS
 app = Flask(__name__)
 CORS(app)
 
-with open("college_data.json") as f:
-    data = json.load(f)
+# Load FAQ data
+with open('college_data.json', 'r') as file:
+    data = json.load(file)
 
 @app.route('/chat', methods=['POST'])
 def chat():
-    message = request.json['message'].lower()
+    user_message = request.json.get('message', '').lower().strip()
 
     for item in data:
-        if item["text"].lower() == message:
-            return jsonify({"response": item["response"]})
+        if item['text'].lower() == user_message:
+            return jsonify({"response": item['response']})
 
-    return jsonify({"response": "Sorry, I don't have information about that."})
+    return jsonify({
+        "response": "Sorry, I don't have information about that. Please contact the administration."
+    })
 
-@app.route('/ping')
+@app.route('/ping', methods=['GET'])
 def ping():
     return jsonify({"response": "Server is running"})
+
+if __name__ == '__main__':
+    app.run(host='0.0.0.0', port=5000)
